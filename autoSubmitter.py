@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 
-nMaximumNumberOfSimultaneousSubmits = 10
+nMaximumNumberOfSimultaneousSubmits = 3
 nSecondsToSleep = 10
 
 nNextSubmitCommand = 0
@@ -45,7 +45,15 @@ def waitForAJobToFinish():
         aRunningJobsCopy = aRunningJobs
         for nJob in aRunningJobsCopy:
             szCommand = "squeue -j " + nJob
-            szOutput = subprocess.check_output( szCommand, shell = True ).decode("utf-8")
+            # this error handling code was added when there is some cluster problem so that
+            # squeue -j returns an error instead of responding with information
+            # (DG, Aug 20, 2025)
+            try:
+                szOutput = subprocess.check_output( szCommand, shell = True ).decode("utf-8")
+            except subprocess.CalledProcessError as e:
+                printLog(f"CalledProcessError from check_output when running {szCommand}" )
+                printLog( str(e.output ) )
+                continue
 
             printLog( f"{szCommand} and got {szOutput}" )
             
