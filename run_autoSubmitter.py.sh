@@ -11,8 +11,14 @@
 source /projects/standard/hsiehph/shared/bin/initialize_conda.sh
 
 module purge
-
-module load python3/3.10.9_anaconda2023.03_libmamba
+# fix (DG, 2025.10.03)
+# the problem was that the module overrode the conda activate fastcn3_env
+# needed by the mapping.smk rule of fastcn and thus it would fail.
+# But autoSubmitter needs python.  biopython is just a way to get it python (any conda
+# environment that had python would do)
+#module load python3/3.10.9_anaconda2023.03_libmamba
+conda activate biopython
+# end
 
 ./autoSubmitter.py
 
