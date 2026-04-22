@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 
-nMaximumNumberOfSimultaneousSubmits = 3
+nMaximumNumberOfSimultaneousSubmits = 500
 nSecondsToSleep = 10
 
 nNextSubmitCommand = 0
@@ -44,7 +44,7 @@ def waitForAJobToFinish():
         
         aRunningJobsCopy = aRunningJobs
         for nJob in aRunningJobsCopy:
-            szCommand = "squeue -j " + nJob
+            szCommand = "sacct -j " + nJob
             # this error handling code was added when there is some cluster problem so that
             # squeue -j returns an error instead of responding with information
             # (DG, Aug 20, 2025)
@@ -66,17 +66,28 @@ def waitForAJobToFinish():
 
             assert len( aLines) >= 1, f"{szCommand} returned {szOutput}"
 
-            szImportantLine = aLines[ len( aLines ) - 1]
+
+            if ( "COMPLETED" in szOutput ):
+                # get job id
+                # looks like:
+                # JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
+                #------------ ---------- ---------- ---------- ---------- ---------- -------- 
+                # 7089235      run_bwa_o+      sioux    hsiehph          1  COMPLETED      0:0 
+                # 7089235.bat+      batch               hsiehph          1  COMPLETED      0:0 
+                # 7089235.ext+     extern               hsiehph          1  COMPLETED      0:0 
+                # 0              1              2        
+                szImportantLine = aLines[ 2 ]
 
 
-            aWords = szImportantLine.split()
-            assert len( aWords ) >= 7, f"{szCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" on line {szImportantLine}"
+                aWords = szImportantLine.split()
+                assert len( aWords ) >= 1, f"{szCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" on line {szImportantLine}"
 
-            if ( aWords[0] == "JOBID" ):
+                assert aWords[0] == nJob, "looking for {nJob} but found {szImportantLine}"
                 printLog( f"{nJob} finished so removing it from list" )
                 aRunningJobs.remove( nJob )
                 bJobFinished = True
-
+                # do not continue to look at other jobs but submit a new job immediately
+                break
 
         if ( not bJobFinished ):
             printLog( f"sleeping" )
