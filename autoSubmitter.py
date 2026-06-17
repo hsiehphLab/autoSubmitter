@@ -8,14 +8,14 @@ import os
 from datetime import datetime
 
 
-nMaximumNumberOfSimultaneousSubmits = 500
+nMaximumNumberOfSimultaneousSubmits = 12
 nSecondsToSleep = 10
 
 nNextSubmitCommand = 0
 
 aDirectoriesAndSbatchCommands = []
 aRunningJobs = []
-
+dictCommandForJobID = {}
 
 # open a log file
 
@@ -82,8 +82,8 @@ def waitForAJobToFinish():
                 aWords = szImportantLine.split()
                 assert len( aWords ) >= 1, f"{szCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" on line {szImportantLine}"
 
-                assert aWords[0] == nJob, "looking for {nJob} but found {szImportantLine}"
-                printLog( f"{nJob} finished so removing it from list" )
+                printLog( f"{szCommandSubmitted} ended with {szOutput} jobid {nJob}")
+                del dictCommandForJobID[ nJob ]
                 aRunningJobs.remove( nJob )
                 bJobFinished = True
                 # do not continue to look at other jobs but submit a new job immediately
@@ -124,7 +124,8 @@ def submitJob( szDirectoryAndSbatchCommand ):
     assert len( aWords ) >= 4, f"{szDirectoryAndSbatchCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" but should have had 4 on line {szImportantLine}"
     szJobID = aWords[3]
     aRunningJobs.append( szJobID )
-
+    dictCommandForJobID[ szJobID ] = szDirectoryAndSbatchCommand
+    
 # def submitJob( szDirectoryAndSbatchCommand ):
 
     
