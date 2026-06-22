@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 
-nMaximumNumberOfSimultaneousSubmits = 12
+nMaximumNumberOfSimultaneousSubmits = 20
 nSecondsToSleep = 10
 
 nNextSubmitCommand = 0
@@ -67,9 +67,9 @@ def waitForAJobToFinish():
             assert len( aLines) >= 1, f"{szCommand} returned {szOutput}"
 
 
-            if ( "COMPLETED" in szOutput ):
+            if ( "RUNNING" not in szOutput ):
                 # get job id
-                # looks like:
+                # might look like (or it could say FAILURE):
                 # JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
                 #------------ ---------- ---------- ---------- ---------- ---------- -------- 
                 # 7089235      run_bwa_o+      sioux    hsiehph          1  COMPLETED      0:0 
