@@ -67,7 +67,7 @@ def waitForAJobToFinish():
             assert len( aLines) >= 1, f"{szCommand} returned {szOutput}"
 
 
-            if ( "RUNNING" not in szOutput ):
+            if ( "RUNNING" not in szOutput and "PENDING" not in szOutput ):
                 # get job id
                 # might look like (or it could say FAILURE):
                 # JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
@@ -81,6 +81,8 @@ def waitForAJobToFinish():
 
                 aWords = szImportantLine.split()
                 assert len( aWords ) >= 1, f"{szCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" on line {szImportantLine}"
+
+                szCommandSubmitted = dictCommandForJobID[nJob]
 
                 printLog( f"{szCommandSubmitted} ended with {szOutput} jobid {nJob}")
                 del dictCommandForJobID[ nJob ]
@@ -159,7 +161,7 @@ while True:
 
 
 
-printLog( f"finished--not more jobs to submit" )
+printLog( f"finished--no more jobs to submit" )
     
     
 
