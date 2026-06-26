@@ -75,7 +75,14 @@ def waitForAJobToFinish():
                 # 7089235      run_bwa_o+      sioux    hsiehph          1  COMPLETED      0:0 
                 # 7089235.bat+      batch               hsiehph          1  COMPLETED      0:0 
                 # 7089235.ext+     extern               hsiehph          1  COMPLETED      0:0 
-                # 0              1              2        
+                # 0              1              2
+                if ( "COMPLETED" in szOutput ):
+                    szStatus = "finished"
+                elif( "FAILED" in szOutput ):
+                    szStatus = "failed"
+                else:
+                    szStatus = "uncertain"
+                
                 szImportantLine = aLines[ 2 ]
 
 
@@ -84,7 +91,7 @@ def waitForAJobToFinish():
 
                 szCommandSubmitted = dictCommandForJobID[nJob]
 
-                printLog( f"{szCommandSubmitted} ended with {szOutput} jobid {nJob}")
+                printLog( f"{szCommandSubmitted} {szStatus} with {szOutput} jobid {nJob}")
                 del dictCommandForJobID[ nJob ]
                 aRunningJobs.remove( nJob )
                 bJobFinished = True
