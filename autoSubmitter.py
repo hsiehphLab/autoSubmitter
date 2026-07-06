@@ -168,7 +168,7 @@ while True:
 
 
 
-printLog( f"finished--no more jobs to submit" )
+printLog( f"autoSubmitter.py ending--no more jobs to submit" )
     
     
 
