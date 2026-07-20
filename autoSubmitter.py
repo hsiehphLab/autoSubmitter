@@ -82,12 +82,28 @@ def waitForAJobToFinish():
                     szStatus = "failed"
                 else:
                     szStatus = "uncertain"
-                
+
+                if ( len( aLines ) < 2 ):
+                    # not sure how this could happen but it does.  I
+                    # think it might be that the node is not in touch
+                    # with the scheduler so gives this response:
+                    # slurm_load_jobs error: Unable to contact slurm
+                    # controller (connect failure)
+                    # What to do?  job might be running.  job might have failed.
+                    # job might have completed.  So just leave it in the RUNNING
+                    # queue to check on it again in a little while.
+                    printLog( f"{szCommand} returned {szOutput} so will assume it is RUNNING" )
+                    continue
+                    
                 szImportantLine = aLines[ 2 ]
 
-
                 aWords = szImportantLine.split()
-                assert len( aWords ) >= 1, f"{szCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" on line {szImportantLine}"
+
+                if ( len( aWords ) < 1 ):
+                    printLog( f"{szCommand} returned {szOutput} with only" + str( len( aWords ) ) + f" on line {szImportantLine}" )
+                    # I'm not aware of this ever happening, but just in case,
+                    # I'm handling it
+                    continue
 
                 szCommandSubmitted = dictCommandForJobID[nJob]
 
