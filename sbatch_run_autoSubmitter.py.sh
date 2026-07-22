@@ -1,1 +1,1 @@
-sbatch --partition=sioux,agsmall run_autoSubmitter.py.sh
+sbatch --partition=sioux,msismall run_autoSubmitter.py.sh
